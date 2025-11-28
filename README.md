@@ -20,5 +20,7 @@ A streamlined system designed for local Barangay Health Centers to automate info
   <img src="Output/edit-immunization.png" width="500" />
   <img src="Output/add-inventory.png" width="500" />
   <img src="Output/edit-inventory.png" width="500" />
+  <img src="Output/add-user.png" width="500" />
+  <img src="Output/edit-user.png" width="500" />
 
 </p>
