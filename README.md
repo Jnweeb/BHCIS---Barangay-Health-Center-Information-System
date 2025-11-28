@@ -12,15 +12,15 @@ A streamlined system designed for local Barangay Health Centers to automate info
 ![Logo](Output/user-management.png)
 
 <p float="left">
-  <img src="Output/add-patient.png" width="500" />
-  <img src="Output/edit-patient.png" width="500" />
-  <img src="Output/add-appointment.png" width="500" />
-  <img src="Output/edit-appointment.png" width="500" />
-  <img src="Output/add-immunization.png" width="500" />
-  <img src="Output/edit-immunization.png" width="500" />
-  <img src="Output/add-inventory.png" width="500" />
-  <img src="Output/edit-inventory.png" width="500" />
-  <img src="Output/add-user.png" width="500" />
-  <img src="Output/edit-user.png" width="500" />
+  <img src="Output/add-patient.png" />
+  <img src="Output/edit-patient.png" />
+  <img src="Output/add-appointment.png" />
+  <img src="Output/edit-appointment.png" />
+  <img src="Output/add-immunization.png" />
+  <img src="Output/edit-immunization.png" />
+  <img src="Output/add-inventory.png" />
+  <img src="Output/edit-inventory.png" />
+  <img src="Output/add-user.png" />
+  <img src="Output/edit-user.png" />
 
 </p>
