@@ -129,20 +129,59 @@ if(isset($_GET['pdf']) && $_GET['pdf'] == 1){
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
-            <p class="welcome"><?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
-            <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small></p>
+            <p class="welcome">
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
+            </p>
         </div>
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="patients.php">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php">📅 Appointments</a></li>
-            <li><a href="immunization.php">💉 Immunization</a></li>
-            <li><a href="inventory.php">💊 Inventory</a></li>
-            <li><a href="reports.php" class="active">📊 Reports</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php">
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php" class="active">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -278,6 +317,7 @@ if(isset($_GET['pdf']) && $_GET['pdf'] == 1){
 
     </div>
 </div>
+<script src="assets/javascript/sidebar.js"></script>
 </body>
 </html>
 <?php $conn->close(); ?>

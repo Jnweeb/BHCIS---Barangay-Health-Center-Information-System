@@ -15,9 +15,8 @@ $limit = 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $start = ($page - 1) * $limit;
 
-/* -----------------------------
-   ADD USER
------------------------------- */
+//ADD USER
+
 if (isset($_POST['register'])) {
     $fullname = trim($_POST['fullname']);
     $username = trim($_POST['username']);
@@ -41,9 +40,8 @@ if (isset($_POST['register'])) {
     exit();
 }
 
-/* -----------------------------
-   EDIT USER
------------------------------- */
+//EDIT USER
+
 if (isset($_POST['edit_user'])) {
     $user_id = $_POST['user_id'];
     $fullname = trim($_POST['fullname']);
@@ -75,9 +73,8 @@ if (isset($_POST['edit_user'])) {
     exit();
 }
 
-/* -----------------------------
-   DELETE USER
------------------------------- */
+//DELETE USER
+
 if (isset($_GET['delete'])) {
     $user_id = $_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM users WHERE user_id=?");
@@ -87,9 +84,9 @@ if (isset($_GET['delete'])) {
     exit();
 }
 
-/* -----------------------------
-   ACTIVATE / DEACTIVATE USER
------------------------------- */
+
+// ACTIVATE / DEACTIVATE USER
+
 if (isset($_GET['toggle'])) {
     $user_id = $_GET['toggle'];
 
@@ -112,9 +109,9 @@ if (isset($_GET['toggle'])) {
     exit();
 }
 
-/* -----------------------------
-   PAGINATION - COUNT USERS
------------------------------- */
+
+//PAGINATION - COUNT USERS
+
 $countQuery = "SELECT COUNT(*) as total FROM users";
 $totalResult = mysqli_query($conn, $countQuery);
 $total = mysqli_fetch_assoc($totalResult)['total'];
@@ -133,25 +130,41 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id ASC LIMIT $s
 
 <body>
 <div class="container">
-
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
             <p class="welcome">
-                <?=htmlspecialchars($_SESSION['fullname'])?><br>
-                <small>(<?=htmlspecialchars($_SESSION['role'])?>)</small>
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
             </p>
         </div>
-
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="register.php" class="active">👥 Users</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php" >
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <?php if ($role === 'admin'): ?>
+            <li>
+                <a href="register.php" class="active">
+                    <img class="icon" src="assets/icons/add-user.svg" alt="Register">
+                    <span class="menu-text">Register User</span>
+                </a>
+            </li>
+            <?php endif; ?>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
@@ -205,13 +218,11 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id ASC LIMIT $s
                                 data-role="<?=$row['role']?>">
                                 Edit
                             </button>
-
                             <a href="register.php?toggle=<?=$row['user_id']?>"
-                               class="btn-warning"
-                               onclick="return confirm('Are you sure you want to <?=$row['status']=="active" ? "deactivate" : "activate"?> this user?');">
+                            class="<?= $row['status']=="active" ? 'btn-warning' : 'btn-primary' ?>"
+                            onclick="return confirm('Are you sure you want to <?=$row['status']=="active" ? "deactivate" : "activate"?> this user?');">
                                 <?=$row['status']=="active" ? "Deactivate" : "Activate"?>
                             </a>
-
                             <a href="register.php?delete=<?=$row['user_id']?>"
                                class="btn-delete"
                                onclick="return confirm('Delete this user permanently?');">
@@ -271,6 +282,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id ASC LIMIT $s
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
                 <option value="healthworker">Health Worker</option>
+                <option value="midwife">Midwife</option>
                 <option value="nurse">Nurse</option>
             </select>
 
@@ -301,55 +313,25 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id ASC LIMIT $s
                 <span class="toggle-password" id="toggleEditPassword"></span>
             </div>
 
-            <label>Role</label>
-            <select name="role" id="edit_role" required>
-                <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="healthworker">Health Worker</option>
-                <option value="nurse">Nurse</option>
-            </select>
+            <div class="role-field">
+                <label for="edit_role">Role</label>
+                <select name="role" id="edit_role" required>
+                    <option value="">Select Role</option>
+                    <option value="admin">Admin</option>
+                    <option value="healthworker">Health Worker</option>
+                    <option value="midwife">MidWife</option>
+                    <option value="nurse">Nurse</option>
+                </select>
+            </div>
 
             <button type="submit" name="edit_user" class="btn-primary">Update User</button>
         </form>
     </div>
 </div>
+<script src="assets/javascript/sidebar.js"></script>
+<script src="assets/javascript/jquery-3.6.0.min.js"></script>
+<script src="assets/javascript/register.js"></script>
+<script src="assets/javascript/hide.js"></script>
 
-<script>
-// Modals
-const userModal = document.getElementById("userModal");
-const editUserModal = document.getElementById("editUserModal");
-document.getElementById("openUserModal").onclick = () => userModal.classList.add("show");
-userModal.querySelector(".close").onclick = () => userModal.classList.remove("show");
-editUserModal.querySelector(".close").onclick = () => editUserModal.classList.remove("show");
-
-// Edit modal fill
-document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        editUserModal.classList.add("show");
-        document.getElementById("edit_user_id").value = btn.dataset.id;
-        document.getElementById("edit_fullname").value = btn.dataset.fullname;
-        document.getElementById("edit_username").value = btn.dataset.username;
-        document.getElementById("edit_role").value = btn.dataset.role;
-        document.getElementById("edit_password").value = "";
-    });
-});
-
-// Hide alert automatically
-document.querySelectorAll('.alert').forEach(alert => {
-    setTimeout(() => alert.style.opacity = "0", 3000);
-    setTimeout(() => alert.remove(), 3500);
-});
-
-const togglePassword = (input, icon) => {
-    icon.onclick = () => {
-        input.type = input.type === "password" ? "text" : "password";
-        icon.classList.toggle("show"); // toggles eye / eye-slash
-    };
-};
-
-togglePassword(document.getElementById("add_password"), document.getElementById("toggleAddPassword"));
-togglePassword(document.getElementById("edit_password"), document.getElementById("toggleEditPassword"));
-
-</script>
 </body>
 </html>

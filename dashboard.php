@@ -3,13 +3,13 @@ session_start();
 include('includes/auth.php');
 include('includes/db_connect.php');
 
-// Helper: check if table exists
+//check if table exists
 function tableExists($conn, $table) {
     $result = mysqli_query($conn, "SHOW TABLES LIKE '$table'");
     return $result && $result->num_rows > 0;
 }
 
-// Helper: get count from table with optional WHERE
+// get count from table with optional WHERE
 function getCount($conn, $table, $where = '') {
     $query = "SELECT COUNT(*) AS total FROM $table" . ($where ? " WHERE $where" : "");
     $result = mysqli_query($conn, $query);
@@ -19,12 +19,12 @@ function getCount($conn, $table, $where = '') {
 // Normalize role
 $role = strtolower($_SESSION['role'] ?? '');
 
-// --- Dashboard stats ---
+//Dashboard stats
 $patients_total = getCount($conn, 'patients');
 $pending_appointments = tableExists($conn, 'appointments') ? getCount($conn, 'appointments', "status='Pending'") : 0;
 $inventory_total = tableExists($conn, 'inventory') ? getCount($conn, 'inventory') : 0;
 
-// --- Chart Data: monthly counts ---
+//Chart Data: monthly count
 function getMonthlyCounts($conn, $table, $dateColumn) {
     if (!tableExists($conn, $table)) return [];
     $query = "SELECT DATE_FORMAT($dateColumn, '%Y-%m') AS month, COUNT(*) AS total
@@ -71,26 +71,69 @@ $immunizations_data = array_map(fn($m) => $immunizations_chart_data[$m] ?? 0, $a
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
-            <p class="welcome"><?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
-            <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small></p>
+            <p class="welcome">
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
+            </p>
         </div>
         <ul>
-            <li><a href="dashboard.php" class="active">🏠 Dashboard</a></li>
-            <li><a href="patients.php">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php">📅 Appointments</a></li>
-            <li><a href="immunization.php">💉 Immunization</a></li>
-            <li><a href="inventory.php">💊 Inventory</a></li>
-            <li><a href="reports.php">📊 Reports</a></li>
+            <li>
+                <a href="dashboard.php" class="active">
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
             <?php if ($role === 'admin'): ?>
-                <li><a href="register.php">➕ Register User</a></li>
+            <li>
+                <a href="register.php">
+                    <img class="icon" src="assets/icons/add-user.svg" alt="Register">
+                    <span class="menu-text">Register User</span>
+                </a>
+            </li>
             <?php endif; ?>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
@@ -113,8 +156,7 @@ $immunizations_data = array_map(fn($m) => $immunizations_chart_data[$m] ?? 0, $a
                     <p><?= $inventory_total ?></p>
                 </div>
             </div>
-
-            <div class="chart-card">
+            <div class="card chart-card">
                 <h3>Monthly Trends</h3>
                 <canvas id="trendsChart"></canvas>
             </div>
@@ -123,6 +165,7 @@ $immunizations_data = array_map(fn($m) => $immunizations_chart_data[$m] ?? 0, $a
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="assets/javascript/sidebar.js"></script>
 <script>
 const ctx = document.getElementById('trendsChart').getContext('2d');
 new Chart(ctx, {

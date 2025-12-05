@@ -3,15 +3,15 @@ session_start();
 include('includes/auth.php');
 include('includes/db_connect.php');
 
-// --- Pagination setup ---
+//Pagination
 $limit = 5;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $start = ($page - 1) * $limit;
 
-// --- Search term ---
+//Search term
 $search = trim($_GET['search'] ?? '');
 
-// --- Get patients for dropdown ---
+//Get patients for dropdown
 $patients = [];
 $patientsQuery = "SELECT patient_id, fullname FROM patients ORDER BY fullname ASC";
 $patientsResult = mysqli_query($conn, $patientsQuery);
@@ -21,7 +21,7 @@ if ($patientsResult) {
     }
 }
 
-// --- Count total immunizations for pagination ---
+//Count total immunizations for pagination
 if ($search) {
     $stmt = $conn->prepare("SELECT COUNT(*) AS total 
                             FROM immunizations i
@@ -38,7 +38,7 @@ $total = $countResult->fetch_assoc()['total'] ?? 0;
 $totalPages = ceil($total / $limit);
 $stmt->close();
 
-// --- Fetch immunizations with search & pagination ---
+//Fetch immunizations with search & pagination
 if ($search) {
     $stmt = $conn->prepare("SELECT i.*, p.fullname AS patient_name
                             FROM immunizations i
@@ -52,7 +52,7 @@ if ($search) {
     $stmt = $conn->prepare("SELECT i.*, p.fullname AS patient_name
                             FROM immunizations i
                             JOIN patients p ON i.patient_id = p.patient_id
-                            ORDER BY i.immunization_id ASC
+                            ORDER BY i.immunization_id DESC
                             LIMIT ?, ?");
     $stmt->bind_param("ii", $start, $limit);
 }
@@ -72,22 +72,62 @@ $stmt->close();
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
-            <p class="welcome"><?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br><small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small></p>
+            <p class="welcome">
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
+            </p>
         </div>
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="patients.php">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php">📅 Appointments</a></li>
-            <li><a href="immunization.php" class="active">💉 Immunization</a></li>
-            <li><a href="inventory.php">💊 Inventory</a></li>
-            <li><a href="reports.php">📊 Reports</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php">
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php" class="active">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
@@ -239,40 +279,9 @@ $stmt->close();
         </div>
     </div>
 </div>
-
-<script>
-// Modal functionality
-const addModal = document.getElementById("addModal");
-const editModal = document.getElementById("editModal");
-document.getElementById("openAddModal").onclick = () => addModal.classList.add('show');
-document.querySelectorAll(".modal .close").forEach(el => el.onclick = () => el.parentElement.parentElement.classList.remove('show'));
-window.onclick = e => { if(e.target.classList.contains('modal')) e.target.classList.remove('show'); }
-
-// Edit buttons
-document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        editModal.classList.add('show');
-        document.getElementById("edit_immunization_id").value = btn.dataset.id;
-        document.getElementById("edit_patient_id").value = btn.dataset.patient;
-        document.getElementById("edit_vaccine").value = btn.dataset.vaccine;
-        document.getElementById("edit_dose").value = btn.dataset.dose;
-        document.getElementById("edit_date_administered").value = btn.dataset.date;
-        document.getElementById("edit_status").value = btn.dataset.status;
-    });
-});
-</script>
-<script>
-// Auto-hide alerts after 3 seconds
-const alerts = document.querySelectorAll('.alert');
-alerts.forEach(alert => {
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        alert.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => alert.remove(), 500); // remove from DOM after fade
-    }, 3000); // 3 seconds before starting fade
-});
-</script>
-
+<script src="assets/javascript/sidebar.js"></script>
+<script src="assets/javascript/immuno.js"></script>
+<script src="assets/javascript/hide.js"></script>
 </body>
 </html>
 

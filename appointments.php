@@ -3,6 +3,15 @@ session_start();
 include('includes/auth.php');
 include('includes/db_connect.php');
 
+// Auto-cancel past appointments that are still Pending
+$update = $conn->prepare("
+    UPDATE appointments 
+    SET status = 'Cancelled'
+    WHERE appointment_date < NOW()
+    AND status = 'Pending'
+");
+$update->execute();
+
 // Pagination
 $limit = 5;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -61,7 +70,7 @@ $query = "SELECT a.*, p.fullname AS patient_name
           FROM appointments a
           JOIN patients p ON a.patient_id = p.patient_id
           $whereSql
-          ORDER BY a.appointment_date ASC
+          ORDER BY a.appointment_date DESC
           LIMIT ?, ?";
 
 $stmt = $conn->prepare($query);
@@ -107,26 +116,63 @@ while($row = $patients_result->fetch_assoc()){
 </head>
 <body>
 <div class="container">
-
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
-            <p class="welcome"><?= htmlspecialchars($_SESSION['fullname'] ?? 'Guest') ?><br>
-            <small>(<?= htmlspecialchars($_SESSION['role'] ?? 'Unknown') ?>)</small></p>
+            <p class="welcome">
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
+            </p>
         </div>
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="patients.php">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php" class="active">📅 Appointments</a></li>
-            <li><a href="immunization.php">💉 Immunization</a></li>
-            <li><a href="inventory.php">💊 Inventory</a></li>
-            <li><a href="reports.php">📊 Reports</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php">
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php" class="active">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
@@ -261,7 +307,7 @@ while($row = $patients_result->fetch_assoc()){
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
-        <h2>Update Appointment</h2>
+        <h2>Edit Appointment</h2>
         <form action="UPDATE/update_appointment_process.php" method="POST">
             <input type="hidden" name="appointment_id" id="edit_appointment_id">
             <label for="edit_patient_id">Patient:</label>
@@ -293,48 +339,9 @@ while($row = $patients_result->fetch_assoc()){
     </div>
 </div>
 
-<script>
-// Add Modal
-const addModal = document.getElementById("addModal");
-document.getElementById("openAddModal").onclick = () => addModal.classList.add("show");
-addModal.querySelector(".close").onclick = () => addModal.classList.remove("show");
-
-// Edit Modal
-const editModal = document.getElementById("editModal");
-editModal.querySelector(".close").onclick = () => editModal.classList.remove("show");
-document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        editModal.classList.add("show");
-        document.getElementById('edit_appointment_id').value = btn.dataset.id;
-        document.getElementById('edit_patient_id').value = btn.dataset.patient_id;
-        document.getElementById('edit_appointment_date').value = btn.dataset.appointment_date;
-        document.getElementById('edit_status').value = btn.dataset.status;
-        document.getElementById('edit_service').value = btn.dataset.service;
-    });
-});
-
-// Close modals on outside click or ESC
-window.addEventListener('click', e => {
-    if(e.target === addModal) addModal.classList.remove("show");
-    if(e.target === editModal) editModal.classList.remove("show");
-});
-window.addEventListener('keydown', e => {
-    if(e.key === "Escape"){
-        addModal.classList.remove("show");
-        editModal.classList.remove("show");
-    }
-});
-
-// Auto-hide alerts
-const alerts = document.querySelectorAll('.alert');
-alerts.forEach(alert => {
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        alert.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => alert.remove(), 500);
-    }, 3000);
-});
-</script>
+<script src="assets/javascript/sidebar.js"></script>
+<script src="assets/javascript/appoint.js"></script>
+<script src="assets/javascript/hide.js"></script>
 
 </body>
 </html>

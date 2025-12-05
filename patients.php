@@ -72,7 +72,7 @@ $query = "
             LIMIT 1
         )
     $whereSql
-    ORDER BY p.patient_id ASC
+    ORDER BY p.patient_id DESC
     LIMIT $start, $limit
 ";
 
@@ -90,25 +90,61 @@ $result = mysqli_query($conn, $query);
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
             <p class="welcome">
-                <?php echo htmlspecialchars($_SESSION['fullname']); ?><br>
-                <small>(<?php echo htmlspecialchars($_SESSION['role']); ?>)</small>
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
             </p>
         </div>
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="patients.php" class="active">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php">📅 Appointments</a></li>
-            <li><a href="immunization.php">💉 Immunization</a></li>
-            <li><a href="inventory.php">💊 Inventory</a></li>
-            <li><a href="reports.php">📊 Reports</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php" >
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php" class="active">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
     <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
@@ -143,9 +179,12 @@ $result = mysqli_query($conn, $query);
                     <label for="address">Address</label>
                     <input type="text" name="address" id="address" required>
 
-                    <label for="contact">Contact</label>
-                    <input type="text" name="contact" id="contact" required>
-
+                    <label for="contact">Contact Number</label>
+                    <div class="contact-wrapper">
+                        <input type="text" id="contact" name="contact" 
+                            placeholder="09XXXXXXXXXX" 
+                            maxlength="11" pattern="\d{11}" required>
+                    </div>
                     <button type="submit" class="btn-primary">Add Patient</button>
                 </form>
             </div>
@@ -299,55 +338,9 @@ $result = mysqli_query($conn, $query);
         </div>
     </div>
 </div>
-<script>
-    // Get all modals
-const modals = document.querySelectorAll('.modal');
-
-// Open Add Patient modal
-const openBtn = document.getElementById("openModal");
-const patientModal = document.getElementById("patientModal");
-
-openBtn.onclick = () => patientModal.classList.add('show');
-
-// Close buttons for all modals
-document.querySelectorAll('.modal .close').forEach(btn => {
-    btn.onclick = () => btn.closest('.modal').classList.remove('show');
-});
-
-// Click outside modal to close
-window.onclick = (e) => {
-    modals.forEach(modal => {
-        if(e.target === modal) modal.classList.remove('show');
-    });
-}
-
-// Edit modal
-const editModal = document.getElementById("editPatientModal");
-document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        editModal.classList.add('show');
-        document.getElementById("edit_patient_id").value = btn.dataset.id;
-        document.getElementById("edit_fullname").value = btn.dataset.fullname;
-        document.getElementById("edit_birthdate").value = btn.dataset.birthdate;
-        document.getElementById("edit_gender").value = btn.dataset.gender;
-        document.getElementById("edit_address").value = btn.dataset.address;
-        document.getElementById("edit_contact").value = btn.dataset.contact;
-    });
-});
-
-</script>
-<script>
-// Auto-hide alerts after 3 seconds
-const alerts = document.querySelectorAll('.alert');
-alerts.forEach(alert => {
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        alert.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => alert.remove(), 500); // remove from DOM after fade
-    }, 3000); // 3 seconds before starting fade
-});
-</script>
-
-
+<script src="assets/javascript/sidebar.js"></script>
+<script src="assets/javascript/jquery-3.6.0.min.js"></script>
+<script src="assets/javascript/patient.js"></script>
+<script src="assets/javascript/hide.js"></script>
 </body>
 </html>

@@ -44,25 +44,62 @@ $units = ['tablets','bottles','rolls','packs','ml','liters','pieces','pairs'];
 <div class="container">
     <!-- Sidebar -->
     <div class="sidebar">
+        <button id="toggleSidebar" class="sidebar-toggle">☰</button>
+
         <div class="sidebar-header">
             <img src="assets/images/logo1.png" alt="TMHC Logo">
             <h2>BHCIS</h2>
             <p class="welcome">
-                <?php echo htmlspecialchars($_SESSION['fullname']); ?><br>
-                <small>(<?php echo htmlspecialchars($_SESSION['role']); ?>)</small>
+                <?= htmlspecialchars($_SESSION['fullname'] ?? '') ?><br>
+                <small>(<?= htmlspecialchars($_SESSION['role'] ?? '') ?>)</small>
             </p>
         </div>
         <ul>
-            <li><a href="dashboard.php">🏠 Dashboard</a></li>
-            <li><a href="patients.php">👨‍⚕️ Patients</a></li>
-            <li><a href="appointments.php">📅 Appointments</a></li>
-            <li><a href="immunization.php">💉 Immunization</a></li>
-            <li><a href="inventory.php" class="active">💊 Inventory</a></li>
-            <li><a href="reports.php">📊 Reports</a></li>
-            <li><a href="logout.php">🚪 Logout</a></li>
+            <li>
+                <a href="dashboard.php" >
+                    <img class="icon" src="assets/icons/dashboard.svg" alt="Dashboard">
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="patients.php">
+                    <img class="icon" src="assets/icons/patient.svg" alt="Patients">
+                    <span class="menu-text">Patient</span>
+                </a>
+            </li>
+            <li>
+                <a href="appointments.php">
+                    <img class="icon" src="assets/icons/appointment.svg" alt="Appointments">
+                    <span class="menu-text">Appointment</span>
+                </a>
+            </li>
+            <li>
+                <a href="immunization.php">
+                    <img class="icon" src="assets/icons/immunization.svg" alt="Immunization">
+                    <span class="menu-text">Immunization</span>
+                </a>
+            </li>
+            <li>
+                <a href="inventory.php" class="active">
+                    <img class="icon" src="assets/icons/inventory.svg" alt="Inventory">
+                    <span class="menu-text">Inventory</span>
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <img class="icon" src="assets/icons/reports.svg" alt="Reports">
+                    <span class="menu-text">Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="logout.php">
+                    <img class="icon" src="assets/icons/logout.svg" alt="Logout">
+                    <span class="menu-text">Logout</span>
+                </a>
+            </li>
         </ul>
     </div>
-
+    <!-- Main Content -->
     <div class="main-content">
         <div class="page-header">
             <h1>Drug/Medicine Inventory</h1>
@@ -229,46 +266,8 @@ $units = ['tablets','bottles','rolls','packs','ml','liters','pieces','pairs'];
         </form>
     </div>
 </div>
-
-<script>
-// Add Modal
-const addModal = document.getElementById('addModal');
-document.getElementById('openAddModal').onclick = () => addModal.classList.add('show');
-addModal.querySelector('.close').onclick = () => addModal.classList.remove('show');
-
-// Edit Modal
-const editModal = document.getElementById('editModal');
-document.querySelectorAll('.btn-edit').forEach(btn => {
-    btn.addEventListener('click', () => {
-        editModal.classList.add('show');
-        document.getElementById('edit_item_id').value = btn.dataset.id;
-        document.getElementById('edit_item_name').value = btn.dataset.name;
-        document.getElementById('edit_category').value = btn.dataset.category;
-        document.getElementById('edit_quantity').value = btn.dataset.quantity;
-        document.getElementById('edit_unit').value = btn.dataset.unit;
-        document.getElementById('edit_expiry').value = btn.dataset.expiry;
-        document.getElementById('edit_status').value = btn.dataset.status;
-    });
-});
-editModal.querySelector('.close').onclick = () => editModal.classList.remove('show');
-
-// Close modals on outside click
-window.addEventListener('click', e => {
-    if(e.target === addModal) addModal.classList.remove('show');
-    if(e.target === editModal) editModal.classList.remove('show');
-});
-</script>
-<script>
-// Auto-hide alerts after 3 seconds
-const alerts = document.querySelectorAll('.alert');
-alerts.forEach(alert => {
-    setTimeout(() => {
-        alert.style.opacity = '0';
-        alert.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => alert.remove(), 500); // remove from DOM after fade
-    }, 3000); // 3 seconds before starting fade
-});
-</script>
-
+<script src="assets/javascript/sidebar.js"></script>
+<script src="assets/javascript/inventory.js"></script>
+<script src="assets/javascript/hide.js"></script>
 </body>
 </html>
